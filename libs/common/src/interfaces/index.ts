@@ -1,0 +1,1 @@
+export * from './user-update-fields.interface';
