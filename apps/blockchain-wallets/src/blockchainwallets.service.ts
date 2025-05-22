@@ -1,25 +1,51 @@
-import { UserDocument, UsersRepository } from '@app/common';
+import { UserDocument, UsersRepository, WalletRepository } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as TronWeb from 'tronweb';
-
+import { WalletDocument } from '@app/common';
 @Injectable()
 export class BlockchainWalletsService {
 
     constructor(
-        // private readonly transactionRepository: TransactionRepository,
         private readonly usersRepository: UsersRepository,
+        private readonly walletRepository: WalletRepository,
         private readonly configService: ConfigService,
-        // private readonly apiKeyService: ApiKeyService
       ) {}
     
       async handleTestNetTronWalletCreation(user: UserDocument,){
         const wallet = await this.generateTestNetWallet();
+        console.log("wallet", wallet);
+
+        const storedWallet = await this.walletRepository.create({
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            user: user._id,
+            privateKey: wallet.privateKey,
+            publicKey: wallet.publicKey,
+            base58: wallet.address.base58,
+            hex: wallet.address.hex,
+        });
+
+        console.log("storedWallet", storedWallet);
+        
         return wallet;
       }
 
       async handleMainNetTronWalletCreation(user: UserDocument,){
         const wallet = await this.generateMainNetWallet();
+
+        const storedWallet = await this.walletRepository.create({
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            user: user._id,
+            privateKey: wallet.privateKey,
+            publicKey: wallet.publicKey,
+            base58: wallet.address.base58,
+            hex: wallet.address.hex,
+        });
+
+        console.log("storedWallet", storedWallet);
+
         return wallet;
       }
       

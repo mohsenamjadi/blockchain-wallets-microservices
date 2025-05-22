@@ -10,17 +10,12 @@ import { BlockchainWalletsModule } from './blockchainwallets.module';
 async function bootstrap() {
   const app = await NestFactory.create(BlockchainWalletsModule);
   const configService = app.get(ConfigService);
-  const KAFKA_HOST = configService.get<string>('KAFKA_HOST');
   app.connectMicroservice({
-    transport: Transport.KAFKA,
-      options: {
-        client: {
-          brokers: [KAFKA_HOST],
-        },
-        consumer: {
-          groupId: 'blockchainwallets-consumer',
-        },
-      },
+    transport: Transport.TCP,
+    options: {
+      host: '0.0.0.0',
+      port: configService.get('TCP_PORT'),
+    },
   });
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));

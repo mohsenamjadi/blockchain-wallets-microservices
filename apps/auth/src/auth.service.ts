@@ -53,19 +53,17 @@ export class AuthService {
 
     const date = new Date();
     
-    console.log("user CreateUserDto", user);
+    console.log("createUserDto", user);
 
     const roles = ["merchant"];
 
-    const emailVerificationToken = this.generateRandomString(64);
-    const emailVerificationExpirationDate = this.calculateExpirationDate();
-
     const createUserData = new CreateUserData( 
-      date, date, user.email, user.username,
-      user.password, "", user.phoneNumber, user.picture, user.firstName, 
-      user.lastName, roles, user.companyName, user.companyDescription, user.age, 
-      user.country, user.city, user.postalCode, "", 0, "", 
-      false, emailVerificationToken, emailVerificationExpirationDate, false, "", null 
+          date, 
+          date, 
+          user.email, 
+          user.username, 
+          user.password, 
+          roles,  
       );
 
     console.log("user createUserData", createUserData);

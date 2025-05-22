@@ -8,5 +8,4 @@ export * from './auth';
 export * from './decorators';
 export * from './interfaces';
 export * from './dto';
-export * from './services';
 

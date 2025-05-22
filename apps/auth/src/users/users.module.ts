@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { ApiKeyService, DatabaseModule, LoggerModule, UserDocument, UserSchema, UsersRepository } from '@app/common';
+import { DatabaseModule, LoggerModule, UserDocument, UserSchema, UsersRepository } from '@app/common';
 import { RefreshTokenRepository } from './refreshtoken.repository';
 import { RefreshTokenDocument, RefreshTokenSchema } from './models/refreshtoken.schema';
-import { MerchantsService } from './merchants.service';
 
 
 @Module({
@@ -17,7 +16,7 @@ import { MerchantsService } from './merchants.service';
     LoggerModule,
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersRepository, RefreshTokenRepository, MerchantsService, ApiKeyService],
+  providers: [UsersService, UsersRepository, RefreshTokenRepository],
   exports: [UsersService]
 })
 export class UsersModule {}

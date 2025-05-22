@@ -1,6 +1,6 @@
 import { 
   Body, Controller, Get, HttpCode, 
-  HttpStatus, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+  HttpStatus, Param, Post, Req, Res, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiOperation, ApiBody, ApiParam } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -11,13 +11,22 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { CreateUserDto } from './users/dto/create-user.dto';
 import JwtRefreshGuard from './guards/jwt-refresh.guard';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { UsersService } from './users/users.service';
+import { Logger } from '@nestjs/common';
 
 
 @ApiTags('auth')
 @Controller('authMicroservice/auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
+
   constructor(
     private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+    private readonly usersService: UsersService,
     ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -123,12 +132,35 @@ export class AuthController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
   @MessagePattern('authenticate')
   async authenticate(
     @Payload() data: any
   ) {
-    return data.user;
+    try {
+      // Extract the token
+      const jwt = data.Authentication;
+      
+      if (!jwt) {
+        throw new UnauthorizedException('No authentication token provided');
+      }
+      
+      // Verify the token
+      const payload = this.jwtService.verify(jwt, {
+        secret: this.configService.get('JWT_SECRET')
+      });
+      
+      // Get the user
+      const user = await this.usersService.getUser({ _id: payload.userId });
+      
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+      
+      return user;
+    } catch (error) {
+      this.logger.error(`Authentication error: ${error.message}`);
+      throw new UnauthorizedException('Invalid token');
+    }
   }
   
 }

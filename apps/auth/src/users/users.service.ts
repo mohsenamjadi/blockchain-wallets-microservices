@@ -29,7 +29,6 @@ export class UsersService {
                 $or: [
                     { email: createUserData.email },
                     { username: createUserData.username },
-                    { phoneNumber: createUserData.phoneNumber },
                 ],
             });
         } catch (error) {
@@ -61,28 +60,6 @@ export class UsersService {
           // Handle any errors if needed
           console.error("Error in findUserByEmail:", error);
           return null;
-        }
-    }
-
-    async findUserByEmailVerificationToken(token: string): Promise<UserDocument | null> {
-        try {
-            const user = await this.usersRepository.findOne({ emailVerificationToken: token });
-            return user || null;
-        } catch (error) {
-            // Handle any errors if needed
-            console.error("Error in findUserByEmailVerificationToken:", error);
-            return null;
-        }
-    }
-    
-    async findUserByForgotPasswordToken(token: string): Promise<UserDocument | null> {
-        try {
-            const user = await this.usersRepository.findOne({ passwordResetToken: token });
-            return user || null;
-        } catch (error) {
-            // Handle any errors if needed
-            console.error("Error in findUserByForgotPasswordToken:", error);
-            return null;
         }
     }
 

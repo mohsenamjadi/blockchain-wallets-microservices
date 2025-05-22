@@ -2,9 +2,8 @@ import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { ApiKeyService, CurrentUser, UserDocument } from '@app/common';
+import { CurrentUser, UserDocument } from '@app/common';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { MerchantsService } from './merchants.service';
 
 
 @ApiTags('users')
@@ -13,7 +12,6 @@ export class UsersController {
 
   constructor(
     private readonly usersService: UsersService,
-    private readonly merchantsService: MerchantsService
     
     ) {}
 
@@ -54,32 +52,5 @@ export class UsersController {
     return await this.usersService.updateProfile(updatedUser, user);
   }
 
-
-  @Get('generateAPIKEY')
-  @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Generate API Key For Merchant' })
-  @ApiResponse({
-    status: 201,
-    description: 'The Generated API Key will be returned',
-  })
-  async generateAPIKEY (
-    @CurrentUser() user: UserDocument
-  ) {
-    return this.merchantsService.generateStoreApiKey(user);
-  }
-
-
-  // @Post('decrypt')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiOperation({ summary: 'decrypt' })
-  // @ApiResponse({
-  //   status: 201,
-  //   description: 'decrypt',
-  // })
-  // async decrypt (
-  //   @Body() body
-  // ) {
-  //   return this.apiKeyService.decrypt(body.decrypt);
-  // }
   
 }
