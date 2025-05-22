@@ -1,0 +1,16 @@
+{
+  "name": "@wallets/blockchain-wallets",
+  "version": "1.0.0",
+  "description": "Blockchain Wallets specific package",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Mohsen",
+  "license": "ISC",
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}

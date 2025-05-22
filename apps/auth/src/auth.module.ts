@@ -26,6 +26,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         JWT_REFRESH_TOKEN_EXPIRATION: Joi.string().required(),
         JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),
         HTTP_PORT: Joi.number().required(),
+        TCP_PORT: Joi.number().required(),
       }),
       envFilePath: './apps/auth/.env',
     }), 
