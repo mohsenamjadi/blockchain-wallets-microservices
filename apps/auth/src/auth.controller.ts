@@ -123,9 +123,6 @@ export class AuthController {
     };
   }
 
-
-
-
   @UseGuards(JwtAuthGuard)
   @MessagePattern('authenticate')
   async authenticate(
@@ -133,7 +130,5 @@ export class AuthController {
   ) {
     return data.user;
   }
-
   
-
 }

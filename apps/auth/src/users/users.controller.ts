@@ -8,7 +8,7 @@ import { MerchantsService } from './merchants.service';
 
 
 @ApiTags('users')
-@Controller('cpgAuth/users')
+@Controller('authMicroservice/users')
 export class UsersController {
 
   constructor(
