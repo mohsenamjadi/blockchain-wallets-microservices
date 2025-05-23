@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  auth:
+    image: mohsenamjadi/bw-auth-microservice:1.0
+    container_name: auth-service
+    ports:
+      - "3001:3001"
+      - "3002:3002"
+    environment:
+      - MONGODB_URI=mongodb://walletsDBUser:walletsDBPassword@host.docker.internal:27018/blockchainwalletsdb
+      - JWT_SECRET=b83FNqn+iisuw310/RZ65axRbI7NycXTHQkxtPOnzukPyXqwuTirG3AXwxIYX5nu7tgelZEMLNkzo1TbdC1g
+      - JWT_EXPIRATION=3600
+      - JWT_REFRESH_TOKEN_SECRET=DU6Jrdu14otIcIkJbhpMIYCYaRRxnae0sa60KBXjTh0ZH9CskbabYqCREZz3Tw1Ou8zX9AQFVrEUscIGQ2b3Q
+      - JWT_REFRESH_TOKEN_EXPIRATION=7200
+      - HTTP_PORT=3001
+      - TCP_PORT=3002
+      - API_KEY_SECRET_KEY=94haDPjS08BH5m1XdCSwshbw8i4w2n1QB2EntLB3afcgEdF7F2N9pEA1g02mJ40x5pcA
+    networks:
+      - wallet-network
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  blockchain-wallets:
+    image: mohsenamjadi/bw-wallets-microservice:1.0
+    container_name: blockchain-wallets-service
+    ports:
+      - "3003:3003"
+      - "3004:3004"
+    environment:
+      - MONGODB_URI=mongodb://walletsDBUser:walletsDBPassword@host.docker.internal:27018/blockchainwalletsdb
+      - HTTP_PORT=3003
+      - TCP_PORT=3004
+      - TRON_PRO_API_KEY=7cd84aa2-d5cd-427f-ab87-0c516503edcc
+      - AUTH_HOST=auth
+      - AUTH_PORT=3002
+    depends_on:
+      - auth
+    networks:
+      - wallet-network
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  wallet-network:
+    driver: bridge
+
+# After first run, execute this command to create the database user:
+# docker exec -it mongodb-blockchainwallets mongosh admin -u dbadmin -p dbpass --eval "db.getSiblingDB('blockchainwalletsdb').createUser({user: 'walletsDBUser', pwd: 'walletsDBPassword', roles: ['readWrite', 'dbAdmin', 'dbOwner']})" 

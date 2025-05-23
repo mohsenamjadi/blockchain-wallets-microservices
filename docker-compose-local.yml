@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-blockchainwallets
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=dbadmin
+      - MONGO_INITDB_ROOT_PASSWORD=dbpass
+    networks:
+      - wallet-network
+    healthcheck:
+      test: mongosh --eval 'db.adminCommand("ping")'
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  mongo-setup:
+    image: mongo:latest
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - wallet-network
+    command: >
+      mongosh --host mongodb -u dbadmin -p dbpass --authenticationDatabase admin --eval 
+      "db.getSiblingDB('blockchainwalletsdb').createUser({user: 'walletsDBUser', pwd: 'walletsDBPassword', roles: ['readWrite', 'dbAdmin', 'dbOwner']});"
+    restart: on-failure
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    container_name: auth-service
+    ports:
+      - "3001:3001"
+      - "3002:3002"
+    volumes:
+      - ./apps/auth:/usr/src/app/apps/auth
+      - ./libs:/usr/src/app/libs
+      - /usr/src/app/node_modules
+    environment:
+      - MONGODB_URI=mongodb://walletsDBUser:walletsDBPassword@mongodb:27017/blockchainwalletsdb
+      - JWT_SECRET=b83FNqn+iisuw310/RZ65axRbI7NycXTHQkxtPOnzukPyXqwuTirG3AXwxIYX5nu7tgelZEMLNkzo1TbdC1g
+      - JWT_EXPIRATION=3600
+      - JWT_REFRESH_TOKEN_SECRET=DU6Jrdu14otIcIkJbhpMIYCYaRRxnae0sa60KBXjTh0ZH9CskbabYqCREZz3Tw1Ou8zX9AQFVrEUscIGQ2b3Q
+      - JWT_REFRESH_TOKEN_EXPIRATION=7200
+      - HTTP_PORT=3001
+      - TCP_PORT=3002
+      - API_KEY_SECRET_KEY=94haDPjS08BH5m1XdCSwshbw8i4w2n1QB2EntLB3afcgEdF7F2N9pEA1g02mJ40x5pcA
+      - NODE_ENV=development
+    depends_on:
+      - mongo-setup
+    networks:
+      - wallet-network
+    command: npm run start:dev auth
+    restart: unless-stopped
+
+  blockchain-wallets:
+    build:
+      context: .
+      dockerfile: ./apps/blockchain-wallets/Dockerfile
+      target: development
+    container_name: blockchain-wallets-service
+    ports:
+      - "3003:3003"
+      - "3004:3004"
+    volumes:
+      - ./apps/blockchain-wallets:/usr/src/app/apps/blockchain-wallets
+      - ./libs:/usr/src/app/libs
+      - /usr/src/app/node_modules
+    environment:
+      - MONGODB_URI=mongodb://walletsDBUser:walletsDBPassword@mongodb:27017/blockchainwalletsdb
+      - HTTP_PORT=3003
+      - TCP_PORT=3004
+      - TRON_PRO_API_KEY=7cd84aa2-d5cd-427f-ab87-0c516503edcc
+      - AUTH_HOST=auth
+      - AUTH_PORT=3002
+      - NODE_ENV=development
+    depends_on:
+      - auth
+    networks:
+      - wallet-network
+    command: npm run start:dev blockchain-wallets
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+
+networks:
+  wallet-network:
+    driver: bridge 

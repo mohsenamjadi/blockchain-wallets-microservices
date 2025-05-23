@@ -11,12 +11,12 @@ RUN npm install -g pnpm
 
 RUN pnpm install
 
-COPY apps/blockchainwallets apps/blockchainwallets
+COPY apps/blockchain-wallets apps/blockchain-wallets
 COPY libs libs
 
-RUN cd apps/blockchainwallets && pnpm install
+RUN cd apps/blockchain-wallets && pnpm install
 
-RUN pnpm run build blockchainwallets
+RUN pnpm run build blockchain-wallets
 
 FROM node:alpine as production
 
@@ -36,4 +36,4 @@ RUN pnpm install --prod
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD ["node", "dist/apps/blockchainwallets/main"]
+CMD ["node", "dist/apps/blockchain-wallets/main"]
