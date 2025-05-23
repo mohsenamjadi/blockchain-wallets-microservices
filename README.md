@@ -13,14 +13,14 @@ This project implements a microservices-based architecture for a blockchain wall
 ```
 ┌─────────────────┐     ┌─────────────────────┐     ┌─────────────────┐
 │                 │     │                     │     │                 │
-│  Client/User    │────▶│  Auth Microservice  │◀───▶│    MongoDB     │
+│  Client/User    │────▶│  Auth Microservice  │◀───▶│    MongoDB      │
 │                 │     │                     │     │                 │
 └─────────────────┘     └──────────▲──────────┘     └────────▲────────┘
-                                   │                         │
-                                   ▼                         │
-                        ┌─────────────────────┐              │
-                        │                     │              │
-                        │ Blockchain-Wallets  │──────────────┘
+        │                          │                         │
+        │                          ▼                         │
+        │               ┌─────────────────────┐              │
+        │               │                     │              │
+        └──────────────▶│ Blockchain-Wallets  │──────────────┘
                         │   Microservice      │
                         │                     │
                         └─────────────────────┘
@@ -146,6 +146,16 @@ pnpm run start:dev
 
 # Build for production
 pnpm run build
+```
+
+```bash
+
+# Start the Auth Microservice
+pnpm run start:dev auth
+
+# Start the Blockchain Wallets Microservice
+pnpm run start:dev blockchain-wallets
+
 ```
 
 ## API Endpoints
